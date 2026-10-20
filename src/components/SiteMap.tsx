@@ -217,6 +217,14 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeId, variant, reducedMotion]);
 
+  /* The fallback note explains the switch, then gets out of the way: left up,
+     it sits over the southern pins. */
+  useEffect(() => {
+    if (!fellBack) return;
+    const id = window.setTimeout(() => setFellBack(false), 7000);
+    return () => window.clearTimeout(id);
+  }, [fellBack]);
+
   /* ── base layer switch ── */
   useEffect(() => {
     basemapRef.current = basemap;
