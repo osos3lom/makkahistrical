@@ -62,11 +62,8 @@ const en = {
     satellite: "Satellite",
     sentinel: "Sentinel-2",
     streets: "Map",
-<<<<<<< Updated upstream
     rotate: "Rotate",
     pause: "Pause rotation",
-=======
->>>>>>> Stashed changes
     basemap: "Base map",
     fallbackNote: "High-resolution imagery did not load, so the map switched to Sentinel-2.",
     miniTitle: "Valley map",
@@ -202,11 +199,8 @@ const ar: Dict = {
     satellite: "قمر صناعي",
     sentinel: "سنتينل-2",
     streets: "خريطة",
-<<<<<<< Updated upstream
     rotate: "تدوير",
     pause: "إيقاف التدوير",
-=======
->>>>>>> Stashed changes
     basemap: "الخريطة الأساسية",
     fallbackNote: "تعذر تحميل الصور عالية الدقة، فانتقلت الخريطة إلى سنتينل-2.",
     miniTitle: "خريطة الوادي",

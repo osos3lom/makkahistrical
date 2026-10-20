@@ -8,7 +8,6 @@ import { useTranslation } from "@/i18n/translations";
 /** Free base layers, no API key.
  *
  *  - Esri World Imagery is the sharpest free satellite layer, but its servers
-<<<<<<< Updated upstream
  *    are not reachable from every network. It is drawn over the Sentinel-2
  *    layer, so where it fails the map is never blank, and after a few failed
  *    tiles the switch moves to Sentinel-2 by itself and says so.
@@ -20,13 +19,6 @@ import { useTranslation } from "@/i18n/translations";
  *
  *  Google and Bing tiles load here too, but their terms forbid using the tile
  *  servers directly, so they are deliberately not offered. */
-=======
- *    are not reachable from every network. If its tiles fail before any has
- *    loaded, the map drops to Sentinel-2 by itself and says so.
- *  - EOX Sentinel-2 cloudless (2016 release, CC BY 4.0) is 10 m imagery:
- *    soft at site scale, but it always loads.
- *  - OpenStreetMap for roads and place names. */
->>>>>>> Stashed changes
 const BASEMAPS = {
   satellite: {
     tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"],
@@ -35,19 +27,11 @@ const BASEMAPS = {
     short: "© Esri, Maxar",
   },
   sentinel: {
-<<<<<<< Updated upstream
     tiles: ["https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2024_3857/default/g/{z}/{y}/{x}.jpg"],
     maxzoom: 15,
     attribution:
       '<a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless 2024</a> by EOX IT Services GmbH (contains modified Copernicus Sentinel data 2024), CC BY-NC-SA 4.0',
     short: "Sentinel-2 cloudless 2024 © EOX, Copernicus",
-=======
-    tiles: ["https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless_3857/default/g/{z}/{y}/{x}.jpg"],
-    maxzoom: 15,
-    attribution:
-      '<a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless</a> by EOX IT Services GmbH (contains modified Copernicus Sentinel data 2016)',
-    short: "Sentinel-2 cloudless © EOX, Copernicus 2016",
->>>>>>> Stashed changes
   },
   streets: {
     tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
@@ -58,7 +42,6 @@ const BASEMAPS = {
 } as const;
 export type BasemapId = keyof typeof BASEMAPS;
 
-<<<<<<< Updated upstream
 /** Sentinel-2 stays on under Esri as its safety net; otherwise one layer. */
 function showBasemap(map: maplibregl.Map, which: BasemapId) {
   const on = (id: BasemapId) => id === which || (which === "satellite" && id === "sentinel");
@@ -77,12 +60,6 @@ const SPIN_RATE = 0.003;
 /** The resting tilt of the landing map. */
 const PITCH = 55;
 
-=======
-function showBasemap(map: maplibregl.Map, which: BasemapId) {
-  for (const id of Object.keys(BASEMAPS)) map.setLayoutProperty(id, "visibility", id === which ? "visible" : "none");
-}
-
->>>>>>> Stashed changes
 /** Bounds that hold all four sites with room for their labels. */
 const VALLEY_BOUNDS: [[number, number], [number, number]] = [
   [40.078, 21.606],
@@ -120,12 +97,9 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
   });
   const [fellBack, setFellBack] = useState(false);
   const basemapRef = useRef<BasemapId>(basemap);
-<<<<<<< Updated upstream
   /** The landing map turns slowly until someone takes hold of it. Off for the
    *  rail map, which is for finding your way, and under reduced motion. */
   const [spinning, setSpinning] = useState(variant === "full" && !reducedMotion);
-=======
->>>>>>> Stashed changes
 
   // Handlers change identity on every parent render; the map is built once.
   const handlers = useRef({ onSelect, onHover });
@@ -145,7 +119,6 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
             { type: "raster", tiles: [...b.tiles], tileSize: 256, maxzoom: b.maxzoom, attribution: b.attribution },
           ]),
         ),
-<<<<<<< Updated upstream
         // Sentinel first, so Esri draws over it when both are on.
         layers: (["sentinel", "satellite", "streets"] as BasemapId[]).map((id) => ({
           id,
@@ -163,20 +136,11 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
           "horizon-fog-blend": 0.6,
           "fog-ground-blend": 0.9,
         },
-=======
-        layers: (Object.keys(BASEMAPS) as BasemapId[]).map((id) => ({
-          id,
-          type: "raster" as const,
-          source: id,
-          layout: { visibility: id === basemap ? ("visible" as const) : ("none" as const) },
-        })),
->>>>>>> Stashed changes
       },
       bounds: VALLEY_BOUNDS,
       fitBoundsOptions: { padding: variant === "mini" ? 12 : 48 },
       maxZoom: 18,
       minZoom: 8,
-<<<<<<< Updated upstream
       maxPitch: 75,
       // The rail map is too small for MapLibre's attribution box; it carries
       // a one-line credit of its own instead (rendered below).
@@ -188,21 +152,10 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
       cooperativeGestures: variant === "mini",
     });
     if (variant === "mini") map.touchZoomRotate.disableRotation();
-=======
-      // The rail map is too small for MapLibre's attribution box; it carries
-      // a one-line credit of its own instead (rendered below).
-      attributionControl: variant === "mini" ? false : { compact: true },
-      dragRotate: false,
-      pitchWithRotate: false,
-      cooperativeGestures: variant === "mini",
-    });
-    map.touchZoomRotate.disableRotation();
->>>>>>> Stashed changes
     styleReady.current = false;
     map.once("style.load", () => {
       styleReady.current = true;
       showBasemap(map, basemapRef.current);
-<<<<<<< Updated upstream
       if (variant === "full") {
         map.addSource("terrain", {
           type: "raster-dem",
@@ -231,13 +184,6 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
     // map on a phone; collapse it to its (i) button once the map is up.
     map.once("load", () => box.querySelector(".maplibregl-ctrl-attrib")?.classList.remove("maplibregl-compact-show"));
     if (variant === "full") map.addControl(new maplibregl.NavigationControl({ showCompass: true, visualizePitch: true }), "bottom-right");
-=======
-    });
-    // The compact attribution starts expanded and covers the bottom of the
-    // map on a phone; collapse it to its (i) button once the map is up.
-    map.once("load", () => box.querySelector(".maplibregl-ctrl-attrib")?.classList.remove("maplibregl-compact-show"));
-    if (variant === "full") map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
->>>>>>> Stashed changes
     map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-left");
 
     // Satellite fallback: if Esri errors before a single tile arrives, the
@@ -278,13 +224,9 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
       el.addEventListener("mouseleave", () => handlers.current.onHover?.(null));
       el.addEventListener("focus", () => handlers.current.onHover?.(s.id));
       el.addEventListener("blur", () => handlers.current.onHover?.(null));
-<<<<<<< Updated upstream
       // Pins stay solid when a ridge passes in front of them: on a turning map
       // MapLibre's default (fading covered markers) makes them flicker.
       new maplibregl.Marker({ element: el, anchor: "center", opacity: "1", opacityWhenCovered: "1" }).setLngLat([s.geo.lng, s.geo.lat]).addTo(map);
-=======
-      new maplibregl.Marker({ element: el, anchor: "center" }).setLngLat([s.geo.lng, s.geo.lat]).addTo(map);
->>>>>>> Stashed changes
       pinRefs.current.set(s.id, el);
     });
 
@@ -337,7 +279,6 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeId, variant, reducedMotion]);
 
-<<<<<<< Updated upstream
   /* ── slow turntable ── */
   useEffect(() => {
     const map = mapRef.current;
@@ -364,8 +305,6 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
     return () => window.clearTimeout(id);
   }, [fellBack]);
 
-=======
->>>>>>> Stashed changes
   /* ── base layer switch ── */
   useEffect(() => {
     basemapRef.current = basemap;
@@ -400,7 +339,6 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
           </button>
         ))}
       </div>
-<<<<<<< Updated upstream
       {variant === "full" && (
         <button
           type="button"
@@ -412,8 +350,6 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
           {spinning && !reducedMotion ? t.map.pause : t.map.rotate}
         </button>
       )}
-=======
->>>>>>> Stashed changes
       {variant === "mini" && (
         <p className="pointer-events-none absolute bottom-0 z-10 max-w-full truncate rounded-tl-md bg-[rgba(255,252,246,0.85)] px-1.5 py-0.5 text-[0.6rem] text-ink-muted ltr:right-0 rtl:left-0 rtl:rounded-tl-none rtl:rounded-tr-md" dir="ltr">
           {BASEMAPS[basemap].short}
