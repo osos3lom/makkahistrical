@@ -1,0 +1,182 @@
+{
+  "madiq": {
+    "triangles": 8028,
+    "anchors": {
+      "narrows": {
+        "anchor": [
+          0.5,
+          0.256,
+          0.364
+        ],
+        "snap": "wall"
+      },
+      "orchards": {
+        "anchor": [
+          0.218,
+          0.111,
+          0.464
+        ],
+        "snap": "court"
+      },
+      "farmhouse": {
+        "anchor": [
+          0.318,
+          0.185,
+          0.436
+        ],
+        "snap": "roof"
+      },
+      "channel": {
+        "anchor": [
+          0.591,
+          0.05,
+          0.509
+        ],
+        "snap": "court"
+      },
+      "upper-valley": {
+        "anchor": [
+          0.936,
+          0.106,
+          0.318
+        ],
+        "snap": "roof"
+      }
+    }
+  },
+  "birkat-mutawakkil": {
+    "triangles": 5296,
+    "anchors": {
+      "walls": {
+        "anchor": [
+          0.653,
+          0.522,
+          0.555
+        ],
+        "snap": "wall"
+      },
+      "steps": {
+        "anchor": [
+          0.427,
+          0.264,
+          0.382
+        ],
+        "snap": "court"
+      },
+      "tank": {
+        "anchor": [
+          0.255,
+          0.363,
+          0.482
+        ],
+        "snap": "court"
+      },
+      "inflow": {
+        "anchor": [
+          0.127,
+          0.436,
+          0.309
+        ],
+        "snap": "roof"
+      },
+      "road": {
+        "anchor": [
+          0.745,
+          0.494,
+          0.773
+        ],
+        "snap": "court"
+      }
+    }
+  },
+  "umm-dumayran": {
+    "triangles": 5176,
+    "anchors": {
+      "pool": {
+        "anchor": [
+          0.611,
+          0.136,
+          0.567
+        ],
+        "snap": "court"
+      },
+      "rooms": {
+        "anchor": [
+          0.3,
+          0.357,
+          0.456
+        ],
+        "snap": "roof"
+      },
+      "enclosure": {
+        "anchor": [
+          0.156,
+          0.315,
+          0.456
+        ],
+        "snap": "wall"
+      },
+      "pool-wall": {
+        "anchor": [
+          0.718,
+          0.266,
+          0.522
+        ],
+        "snap": "wall"
+      },
+      "sawla": {
+        "anchor": [
+          0.5,
+          0.798,
+          0.078
+        ],
+        "snap": "roof"
+      }
+    }
+  },
+  "zaymah": {
+    "triangles": 10282,
+    "anchors": {
+      "fort-walls": {
+        "anchor": [
+          0.514,
+          0.926,
+          0.49
+        ],
+        "snap": "wall"
+      },
+      "towers": {
+        "anchor": [
+          0.29,
+          0.96,
+          0.4
+        ],
+        "snap": "roof"
+      },
+      "columns": {
+        "anchor": [
+          0.4,
+          0.881,
+          0.497
+        ],
+        "snap": "court"
+      },
+      "spring": {
+        "anchor": [
+          0.81,
+          0.206,
+          0.65
+        ],
+        "snap": "court"
+      },
+      "madraj": {
+        "anchor": [
+          0.35,
+          0.493,
+          0.77
+        ],
+        "snap": "court"
+      }
+    }
+  }
+}

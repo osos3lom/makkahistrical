@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="960" height="640">
+<rect width="960" height="640" fill="#f3ebdd"/>
+<line x1="0" x2="960" y1="457.76387096765893" y2="457.76387096765893" stroke="#3b2f25" stroke-opacity=".07"/><line x1="0" x2="960" y1="307.9999999998936" y2="307.9999999998936" stroke="#3b2f25" stroke-opacity=".07"/><line x1="0" x2="960" y1="158.23612903212822" y2="158.23612903212822" stroke="#3b2f25" stroke-opacity=".07"/><line y1="0" y2="610" x1="115.50419438004337" x2="115.50419438004337" stroke="#3b2f25" stroke-opacity=".07"/><line y1="0" y2="610" x1="255.6948888492115" x2="255.6948888492115" stroke="#3b2f25" stroke-opacity=".07"/><line y1="0" y2="610" x1="395.8855833183796" x2="395.8855833183796" stroke="#3b2f25" stroke-opacity=".07"/><line y1="0" y2="610" x1="536.0762777875477" x2="536.0762777875477" stroke="#3b2f25" stroke-opacity=".07"/><line y1="0" y2="610" x1="676.2669722567158" x2="676.2669722567158" stroke="#3b2f25" stroke-opacity=".07"/><line y1="0" y2="610" x1="816.4576667258839" x2="816.4576667258839" stroke="#3b2f25" stroke-opacity=".07"/><line y1="0" y2="610" x1="956.6483611950521" x2="956.6483611950521" stroke="#3b2f25" stroke-opacity=".07"/><path d="M691.1 2.9L451.0 130.8L281.2 328.0L492.2 663.9" fill="none" stroke="#8a7a66" stroke-width="2" stroke-dasharray="6 6"/><g font-family="Inter,Segoe UI,Arial,sans-serif">
+<circle cx="691.0570905233285" cy="2.9160184516007916" r="12" fill="#fff" stroke="#3b2f25" stroke-width="2"/>
+<text x="691.0570905233285" y="7.916018451600792" text-anchor="middle" font-size="12" font-weight="700" fill="#3b2f25">1</text>
+<text x="715.0570905233285" y="0.9160184516007916" font-size="15" font-weight="500" fill="#3b2f25">Al-Madiq</text>
+<text x="715.0570905233285" y="20.91601845160079" font-size="14" fill="#8a7a66" font-family="Tajawal,Segoe UI,Arial,sans-serif">المضيق</text></g><g font-family="Inter,Segoe UI,Arial,sans-serif">
+<circle cx="450.95248810600646" cy="130.84431703227668" r="12" fill="#fff" stroke="#3b2f25" stroke-width="2"/>
+<text x="450.95248810600646" y="135.84431703227668" text-anchor="middle" font-size="12" font-weight="700" fill="#3b2f25">2</text>
+<text x="474.95248810600646" y="128.84431703227668" font-size="15" font-weight="500" fill="#3b2f25">Birkat al-Mutawakkil</text>
+<text x="474.95248810600646" y="148.84431703227668" font-size="14" fill="#8a7a66" font-family="Tajawal,Segoe UI,Arial,sans-serif">بركة المتوكل</text></g><g font-family="Inter,Segoe UI,Arial,sans-serif">
+<circle cx="281.18155710381234" cy="328.0384059354914" r="17" fill="#a55338" stroke="#a55338" stroke-width="2"/>
+<text x="281.18155710381234" y="333.0384059354914" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">3</text>
+<text x="305.18155710381234" y="326.0384059354914" font-size="19" font-weight="700" fill="#3b2f25">Umm al-Dumayran</text>
+<text x="305.18155710381234" y="346.0384059354914" font-size="17" fill="#a55338" font-family="Tajawal,Segoe UI,Arial,sans-serif">أم الضيمران</text></g><g font-family="Inter,Segoe UI,Arial,sans-serif">
+<circle cx="492.1545332104724" cy="663.8988629677403" r="12" fill="#fff" stroke="#3b2f25" stroke-width="2"/>
+<text x="492.1545332104724" y="668.8988629677403" text-anchor="middle" font-size="12" font-weight="700" fill="#3b2f25">4</text>
+<text x="516.1545332104724" y="661.8988629677403" font-size="15" font-weight="500" fill="#3b2f25">Al-Zaymah</text>
+<text x="516.1545332104724" y="681.8988629677403" font-size="14" fill="#8a7a66" font-family="Tajawal,Segoe UI,Arial,sans-serif">الزيمة</text></g><g transform="translate(910 60)" font-family="Inter,Arial,sans-serif">
+<circle r="22" fill="none" stroke="#3b2f25" stroke-opacity=".35"/>
+<path d="M0 -18 L6 6 L0 2 L-6 6Z" fill="#3b2f25"/>
+<text y="-26" text-anchor="middle" font-size="13" font-weight="700" fill="#3b2f25">N</text></g><g transform="translate(40 50)" font-family="Inter,Arial,sans-serif" font-size="12" fill="#3b2f25">
+<rect width="67.74193548387098" height="6" fill="#3b2f25"/><rect x="67.74193548387098" width="67.74193548387098" height="6" fill="none" stroke="#3b2f25"/>
+<text y="-6">0</text><text x="135.48387096774195" y="-6" text-anchor="end">1 km</text></g>
+<text x="20" y="624" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" fill="#8a7a66">Wadi Nakhla · وادي نخلة — schematic, not for navigation</text>
+</svg>

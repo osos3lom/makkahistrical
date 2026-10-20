@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="960" height="640">
+<rect width="960" height="640" fill="#f3ebdd"/>
+<path d="M167.896761214489 395.8651282051288L481.1207247002008 126.18040676922922L804.0009796786303 154.94461538461363L794.2278353735701 568.4209025641038" fill="none" stroke="#a55338" stroke-width="3" stroke-dasharray="10 7"/><path d="M890 40 Q 641.1207247002008 6.180406769229222 493.1207247002008 116.18040676922922" fill="none" stroke="#3b2f25" stroke-width="2.5" stroke-dasharray="3 6"/>
+<text x="890" y="30" text-anchor="end" font-family="Inter,Arial,sans-serif" font-size="14" fill="#3b2f25">Darb Zubayda from Kufa · درب زبيدة من الكوفة</text><g font-family="Inter,Segoe UI,Arial,sans-serif">
+<circle cx="167.896761214489" cy="395.8651282051288" r="9" fill="#3b2f25"/>
+<text x="151.896761214489" y="393.8651282051288" text-anchor="end" font-size="15" font-weight="500" fill="#3b2f25">Makkah</text>
+<text x="151.896761214489" y="412.8651282051288" text-anchor="end" font-size="14" fill="#8a7a66" font-family="Tajawal,Segoe UI,Arial,sans-serif">مكة المكرمة</text></g><g font-family="Inter,Segoe UI,Arial,sans-serif">
+<circle cx="481.1207247002008" cy="126.18040676922922" r="13" fill="#a55338"/>
+<text x="499.1207247002008" y="124.18040676922922" text-anchor="start" font-size="18" font-weight="700" fill="#3b2f25">Wadi Nakhla</text>
+<text x="499.1207247002008" y="143.18040676922922" text-anchor="start" font-size="14" fill="#a55338" font-family="Tajawal,Segoe UI,Arial,sans-serif">وادي نخلة</text></g><g font-family="Inter,Segoe UI,Arial,sans-serif">
+<circle cx="804.0009796786303" cy="154.94461538461363" r="6" fill="#3b2f25"/>
+<text x="822.0009796786303" y="152.94461538461363" text-anchor="start" font-size="15" font-weight="500" fill="#3b2f25">As-Sayl al-Kabir (Qarn al-Manazil)</text>
+<text x="822.0009796786303" y="171.94461538461363" text-anchor="start" font-size="14" fill="#8a7a66" font-family="Tajawal,Segoe UI,Arial,sans-serif">السيل الكبير (قرن المنازل)</text></g><g font-family="Inter,Segoe UI,Arial,sans-serif">
+<circle cx="794.2278353735701" cy="568.4209025641038" r="9" fill="#3b2f25"/>
+<text x="812.2278353735701" y="566.4209025641038" text-anchor="start" font-size="15" font-weight="500" fill="#3b2f25">Taif</text>
+<text x="812.2278353735701" y="585.4209025641038" text-anchor="start" font-size="14" fill="#8a7a66" font-family="Tajawal,Segoe UI,Arial,sans-serif">الطائف</text></g><g transform="translate(910 550)" font-family="Inter,Arial,sans-serif">
+<circle r="22" fill="none" stroke="#3b2f25" stroke-opacity=".35"/>
+<path d="M0 -18 L6 6 L0 2 L-6 6Z" fill="#3b2f25"/>
+<text y="-26" text-anchor="middle" font-size="13" font-weight="700" fill="#3b2f25">N</text></g><g transform="translate(40 50)" font-family="Inter,Arial,sans-serif" font-size="12" fill="#3b2f25">
+<rect width="51.282051282051285" height="6" fill="#3b2f25"/><rect x="51.282051282051285" width="51.282051282051285" height="6" fill="none" stroke="#3b2f25"/>
+<text y="-6">0</text><text x="102.56410256410257" y="-6" text-anchor="end">10 km</text></g>
+<text x="20" y="624" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="13" fill="#8a7a66">Old Makkah–Taif road through Nakhla · schematic, not for navigation</text>
+</svg>
