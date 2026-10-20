@@ -8,11 +8,17 @@ import { useTranslation } from "@/i18n/translations";
 /** Free base layers, no API key.
  *
  *  - Esri World Imagery is the sharpest free satellite layer, but its servers
- *    are not reachable from every network. If its tiles fail before any has
- *    loaded, the map drops to Sentinel-2 by itself and says so.
- *  - EOX Sentinel-2 cloudless (2016 release, CC BY 4.0) is 10 m imagery:
- *    soft at site scale, but it always loads.
- *  - OpenStreetMap for roads and place names. */
+ *    are not reachable from every network. It is drawn over the Sentinel-2
+ *    layer, so where it fails the map is never blank, and after a few failed
+ *    tiles the switch moves to Sentinel-2 by itself and says so.
+ *  - EOX Sentinel-2 cloudless 2024 is a 10 m mosaic: soft at site scale, but
+ *    clean (no cloud, no haze, consistent colour) and it always loads. Its
+ *    licence is CC BY-NC-SA 4.0: fine for this non-commercial atlas, and the
+ *    thing to revisit if that ever changes.
+ *  - OpenStreetMap for roads and place names.
+ *
+ *  Google and Bing tiles load here too, but their terms forbid using the tile
+ *  servers directly, so they are deliberately not offered. */
 const BASEMAPS = {
   satellite: {
     tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"],
@@ -21,11 +27,11 @@ const BASEMAPS = {
     short: "© Esri, Maxar",
   },
   sentinel: {
-    tiles: ["https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless_3857/default/g/{z}/{y}/{x}.jpg"],
+    tiles: ["https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless-2024_3857/default/g/{z}/{y}/{x}.jpg"],
     maxzoom: 15,
     attribution:
-      '<a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless</a> by EOX IT Services GmbH (contains modified Copernicus Sentinel data 2016)',
-    short: "Sentinel-2 cloudless © EOX, Copernicus 2016",
+      '<a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless 2024</a> by EOX IT Services GmbH (contains modified Copernicus Sentinel data 2024), CC BY-NC-SA 4.0',
+    short: "Sentinel-2 cloudless 2024 © EOX, Copernicus",
   },
   streets: {
     tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
@@ -36,9 +42,23 @@ const BASEMAPS = {
 } as const;
 export type BasemapId = keyof typeof BASEMAPS;
 
+/** Sentinel-2 stays on under Esri as its safety net; otherwise one layer. */
 function showBasemap(map: maplibregl.Map, which: BasemapId) {
-  for (const id of Object.keys(BASEMAPS)) map.setLayoutProperty(id, "visibility", id === which ? "visible" : "none");
+  const on = (id: BasemapId) => id === which || (which === "satellite" && id === "sentinel");
+  for (const id of Object.keys(BASEMAPS) as BasemapId[]) map.setLayoutProperty(id, "visibility", on(id) ? "visible" : "none");
 }
+
+/** Open terrain (Mapterhorn, 30 m here) so the tilted, turning map shows the
+ *  valley as a valley. */
+const TERRAIN = {
+  tiles: ["https://tiles.mapterhorn.com/{z}/{x}/{y}.webp"],
+  attribution: '<a href="https://mapterhorn.com/attribution" target="_blank" rel="noopener">© Mapterhorn</a>',
+};
+
+/** Degrees per millisecond: one full turn every two minutes. */
+const SPIN_RATE = 0.003;
+/** The resting tilt of the landing map. */
+const PITCH = 55;
 
 /** Bounds that hold all four sites with room for their labels. */
 const VALLEY_BOUNDS: [[number, number], [number, number]] = [
@@ -77,6 +97,9 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
   });
   const [fellBack, setFellBack] = useState(false);
   const basemapRef = useRef<BasemapId>(basemap);
+  /** The landing map turns slowly until someone takes hold of it. Off for the
+   *  rail map, which is for finding your way, and under reduced motion. */
+  const [spinning, setSpinning] = useState(variant === "full" && !reducedMotion);
 
   // Handlers change identity on every parent render; the map is built once.
   const handlers = useRef({ onSelect, onHover });
@@ -96,34 +119,71 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
             { type: "raster", tiles: [...b.tiles], tileSize: 256, maxzoom: b.maxzoom, attribution: b.attribution },
           ]),
         ),
-        layers: (Object.keys(BASEMAPS) as BasemapId[]).map((id) => ({
+        // Sentinel first, so Esri draws over it when both are on.
+        layers: (["sentinel", "satellite", "streets"] as BasemapId[]).map((id) => ({
           id,
           type: "raster" as const,
           source: id,
-          layout: { visibility: id === basemap ? ("visible" as const) : ("none" as const) },
+          layout: { visibility: "none" as const },
+          // A touch of contrast lifts the haze that desert imagery carries.
+          paint: id === "streets" ? {} : { "raster-contrast": 0.1, "raster-saturation": 0.05, "raster-brightness-min": 0.05, "raster-fade-duration": 200 },
         })),
+        sky: {
+          "sky-color": "#c9dbe6",
+          "horizon-color": "#efe5d3",
+          "fog-color": "#efe5d3",
+          "sky-horizon-blend": 0.5,
+          "horizon-fog-blend": 0.6,
+          "fog-ground-blend": 0.9,
+        },
       },
       bounds: VALLEY_BOUNDS,
       fitBoundsOptions: { padding: variant === "mini" ? 12 : 48 },
       maxZoom: 18,
       minZoom: 8,
+      maxPitch: 75,
       // The rail map is too small for MapLibre's attribution box; it carries
       // a one-line credit of its own instead (rendered below).
       attributionControl: variant === "mini" ? false : { compact: true },
-      dragRotate: false,
-      pitchWithRotate: false,
+      // The landing map can be turned and tilted; the rail map stays a flat,
+      // north-up map for finding your way.
+      dragRotate: variant === "full",
+      pitchWithRotate: variant === "full",
       cooperativeGestures: variant === "mini",
     });
-    map.touchZoomRotate.disableRotation();
+    if (variant === "mini") map.touchZoomRotate.disableRotation();
     styleReady.current = false;
     map.once("style.load", () => {
       styleReady.current = true;
       showBasemap(map, basemapRef.current);
+      if (variant === "full") {
+        map.addSource("terrain", {
+          type: "raster-dem",
+          tiles: TERRAIN.tiles,
+          tileSize: 512,
+          encoding: "terrarium",
+          maxzoom: 12,
+          attribution: TERRAIN.attribution,
+        });
+        map.setTerrain({ source: "terrain", exaggeration: 1.4 });
+      }
     });
+    if (variant === "full") {
+      map.once("load", () =>
+        map.easeTo({ pitch: PITCH, bearing: -20, zoom: map.getZoom() + 0.7, duration: reducedMotion ? 0 : 1800 }),
+      );
+      // Any hand on the map stops the turntable; the button starts it again.
+      const stop = (e: { originalEvent?: Event }) => {
+        if (e.originalEvent) setSpinning(false);
+      };
+      map.on("mousedown", stop);
+      map.on("touchstart", stop);
+      map.on("wheel", stop);
+    }
     // The compact attribution starts expanded and covers the bottom of the
     // map on a phone; collapse it to its (i) button once the map is up.
     map.once("load", () => box.querySelector(".maplibregl-ctrl-attrib")?.classList.remove("maplibregl-compact-show"));
-    if (variant === "full") map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
+    if (variant === "full") map.addControl(new maplibregl.NavigationControl({ showCompass: true, visualizePitch: true }), "bottom-right");
     map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-left");
 
     // Satellite fallback: if Esri errors before a single tile arrives, the
@@ -164,7 +224,9 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
       el.addEventListener("mouseleave", () => handlers.current.onHover?.(null));
       el.addEventListener("focus", () => handlers.current.onHover?.(s.id));
       el.addEventListener("blur", () => handlers.current.onHover?.(null));
-      new maplibregl.Marker({ element: el, anchor: "center" }).setLngLat([s.geo.lng, s.geo.lat]).addTo(map);
+      // Pins stay solid when a ridge passes in front of them: on a turning map
+      // MapLibre's default (fading covered markers) makes them flicker.
+      new maplibregl.Marker({ element: el, anchor: "center", opacity: "1", opacityWhenCovered: "1" }).setLngLat([s.geo.lng, s.geo.lat]).addTo(map);
       pinRefs.current.set(s.id, el);
     });
 
@@ -217,6 +279,24 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeId, variant, reducedMotion]);
 
+  /* ── slow turntable ── */
+  useEffect(() => {
+    const map = mapRef.current;
+    // Reduced motion, even switched on mid-visit, holds it still.
+    if (!map || !spinning || reducedMotion || variant !== "full") return;
+    let raf = 0;
+    let last = performance.now();
+    const step = (now: number) => {
+      const dt = Math.min(now - last, 64);
+      last = now;
+      // Leave the camera alone while it is flying somewhere or being dragged.
+      if (!map.isEasing() && !map.isMoving()) map.setBearing(map.getBearing() + dt * SPIN_RATE);
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [spinning, reducedMotion, variant]);
+
   /* The fallback note explains the switch, then gets out of the way: left up,
      it sits over the southern pins. */
   useEffect(() => {
@@ -259,6 +339,17 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
           </button>
         ))}
       </div>
+      {variant === "full" && (
+        <button
+          type="button"
+          onClick={() => setSpinning((v) => !v)}
+          aria-pressed={spinning}
+          className="absolute top-2 z-10 flex items-center gap-1.5 rounded-lg border border-line-warm bg-[rgba(255,252,246,0.94)] px-2.5 py-1 text-[0.76rem] font-medium text-ink-soft shadow-sm backdrop-blur transition-colors hover:text-ink ltr:left-2 rtl:right-2"
+        >
+          <span aria-hidden className={`inline-block h-2 w-2 rounded-full ${spinning && !reducedMotion ? "bg-terracotta" : "bg-[#c9b89c]"}`} />
+          {spinning && !reducedMotion ? t.map.pause : t.map.rotate}
+        </button>
+      )}
       {variant === "mini" && (
         <p className="pointer-events-none absolute bottom-0 z-10 max-w-full truncate rounded-tl-md bg-[rgba(255,252,246,0.85)] px-1.5 py-0.5 text-[0.6rem] text-ink-muted ltr:right-0 rtl:left-0 rtl:rounded-tl-none rtl:rounded-tr-md" dir="ltr">
           {BASEMAPS[basemap].short}

@@ -40,8 +40,9 @@ npm run models:placeholder   # rebuild GLBs, card images and hotspot anchors
 - [`src/components/AtlasApp.tsx`](src/components/AtlasApp.tsx): the shell for both views; one instance
   survives moving between the map and sites, so the 3D engine is not rebuilt.
 - [`src/components/SiteMap.tsx`](src/components/SiteMap.tsx): MapLibre with free base layers, no API
-  key. Esri World Imagery first; if it can't be reached, it falls back to EOX Sentinel-2 cloudless
-  (CC BY 4.0) on its own. OpenStreetMap as the third option.
+  key. Esri World Imagery is drawn over EOX Sentinel-2 cloudless 2024 (CC BY-NC-SA 4.0), so the map
+  is never blank where Esri is blocked. OpenStreetMap as the third option. The landing map is tilted
+  over Mapterhorn 3D terrain and turns slowly until touched (off under reduced motion).
 - [`src/components/PhotoGallery.tsx`](src/components/PhotoGallery.tsx): curated photos from the site
   data, live Wikimedia Commons geosearch within 10 km (with author and licence on every image), the
   model renders, and links out to Google Maps photos and Mapillary.
