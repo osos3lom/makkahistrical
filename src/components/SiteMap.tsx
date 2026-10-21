@@ -4,6 +4,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import type { Site } from "@/types/empire";
 import type { Language } from "@/types/i18n";
 import { useTranslation } from "@/i18n/translations";
+import nakhlaBranches from "@/data/nakhla-branches.json";
 
 /** Free base layers, no API key.
  *
@@ -66,6 +67,51 @@ const VALLEY_BOUNDS: [[number, number], [number, number]] = [
   [40.136, 21.671],
 ];
 
+/** The Kaaba, and the middle of the valley it is measured from. */
+const MAKKAH: [number, number] = [39.8262, 21.4225];
+const VALLEY_CENTER: [number, number] = [
+  (VALLEY_BOUNDS[0][0] + VALLEY_BOUNDS[1][0]) / 2,
+  (VALLEY_BOUNDS[0][1] + VALLEY_BOUNDS[1][1]) / 2,
+];
+/** Bounds that hold Makkah and both branches of the valley together. */
+const REGION_BOUNDS: [[number, number], [number, number]] = [
+  [MAKKAH[0] - 0.02, MAKKAH[1] - 0.02],
+  [40.2, 21.72],
+];
+
+/** The two Nakhla valleys, traced from OpenStreetMap (ODbL). Both drain
+ *  west and meet just below Birkat al-Mutawakkil: al-Madiq is on al-Shamiyyah,
+ *  Umm al-Dumayran and al-Zaymah on al-Yamaniyyah. */
+const BRANCHES = {
+  yamaniyyah: { color: "#5fb8e6", labelAt: 40.15 },
+  shamiyyah: { color: "#86d8bf", labelAt: 40.1 },
+} as const;
+type BranchId = keyof typeof BRANCHES;
+const BRANCHES_ATTRIBUTION = 'Wadi courses © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
+
+/** The vertex of a branch nearest a given longitude, for its label. */
+function branchLabelPoint(id: BranchId): [number, number] {
+  const f = nakhlaBranches.features.find((x) => x.properties.id === id)!;
+  const pts = f.geometry.coordinates as [number, number][];
+  return pts.reduce((best, p) => (Math.abs(p[0] - BRANCHES[id].labelAt) < Math.abs(best[0] - BRANCHES[id].labelAt) ? p : best));
+}
+
+/** Room for the Makkah label (south-west corner) and the map controls. */
+const REGION_PADDING = { top: 70, right: 60, bottom: 110, left: 200 };
+
+const rad = (d: number) => (d * Math.PI) / 180;
+/** Great-circle distance in km and initial bearing in degrees. */
+function distBearing([lng1, lat1]: [number, number], [lng2, lat2]: [number, number]) {
+  const dLat = rad(lat2 - lat1);
+  const dLng = rad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLng / 2) ** 2;
+  const km = 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const y = Math.sin(dLng) * Math.cos(rad(lat2));
+  const x = Math.cos(rad(lat1)) * Math.sin(rad(lat2)) - Math.sin(rad(lat1)) * Math.cos(rad(lat2)) * Math.cos(dLng);
+  return { km, bearing: (Math.atan2(y, x) * 180) / Math.PI };
+}
+const MAKKAH_KM = Math.round(distBearing(VALLEY_CENTER, MAKKAH).km);
+
 interface Props {
   sites: Site[];
   activeId?: string;
@@ -86,6 +132,10 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
    *  waits for tiles, so it reads false for as long as a layer is downloading. */
   const styleReady = useRef(false);
   const pinRefs = useRef(new Map<string, HTMLButtonElement>());
+  const makkahPinRef = useRef<HTMLButtonElement | null>(null);
+  const branchLabelRefs = useRef(new Map<BranchId, HTMLSpanElement>());
+  /** Points the way to Makkah from the edge of the map while it is off screen. */
+  const compassRef = useRef<HTMLButtonElement>(null);
   const [basemap, setBasemap] = useState<BasemapId>(() => {
     try {
       const v = sessionStorage.getItem("atlas-basemap");
@@ -166,6 +216,41 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
           attribution: TERRAIN.attribution,
         });
         map.setTerrain({ source: "terrain", exaggeration: 1.4 });
+
+        map.addSource("branches", { type: "geojson", data: nakhlaBranches as maplibregl.GeoJSONSourceSpecification["data"], attribution: BRANCHES_ATTRIBUTION });
+        const branchColor = ["match", ["get", "id"], ...Object.entries(BRANCHES).flatMap(([id, b]) => [id, b.color]), "#5fb8e6"];
+        map.addLayer({
+          id: "branches-halo",
+          type: "line",
+          source: "branches",
+          layout: { "line-join": "round", "line-cap": "round" },
+          paint: { "line-color": "#14202a", "line-opacity": 0.5, "line-width": 6 },
+        });
+        map.addLayer({
+          id: "branches",
+          type: "line",
+          source: "branches",
+          layout: { "line-join": "round", "line-cap": "round" },
+          paint: { "line-color": branchColor as maplibregl.ExpressionSpecification, "line-width": 3 },
+        });
+
+        // The way from the valley down to Makkah, as the crow flies.
+        map.addSource("to-makkah", {
+          type: "geojson",
+          data: { type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: [VALLEY_CENTER, MAKKAH] } },
+        });
+        map.addLayer({
+          id: "to-makkah-halo",
+          type: "line",
+          source: "to-makkah",
+          paint: { "line-color": "#3b2d21", "line-opacity": 0.45, "line-width": 5 },
+        });
+        map.addLayer({
+          id: "to-makkah",
+          type: "line",
+          source: "to-makkah",
+          paint: { "line-color": "#f3d58a", "line-width": 2.5, "line-dasharray": [2, 1.5] },
+        });
       }
     });
     if (variant === "full") {
@@ -230,6 +315,58 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
       pinRefs.current.set(s.id, el);
     });
 
+    if (variant === "full") {
+      const showRegion = () => {
+        setSpinning(false);
+        map.fitBounds(REGION_BOUNDS, { padding: REGION_PADDING, pitch: 30, bearing: 0, duration: reducedMotion ? 0 : 1600 });
+      };
+      const el = document.createElement("button");
+      el.type = "button";
+      el.className = "makkah-pin";
+      el.innerHTML = `<span class="makkah-pin__mark" aria-hidden="true"></span><span class="makkah-pin__label"><b></b><small></small></span>`;
+      el.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        showRegion();
+      });
+      new maplibregl.Marker({ element: el, anchor: "center", opacity: "1", opacityWhenCovered: "1" }).setLngLat(MAKKAH).addTo(map);
+      makkahPinRef.current = el;
+
+      branchLabelRefs.current.clear();
+      for (const id of Object.keys(BRANCHES) as BranchId[]) {
+        const lab = document.createElement("span");
+        lab.className = "wadi-label";
+        lab.style.setProperty("--wadi", BRANCHES[id].color);
+        new maplibregl.Marker({ element: lab, anchor: "bottom", offset: [0, -6], opacity: "1", opacityWhenCovered: "1" })
+          .setLngLat(branchLabelPoint(id))
+          .addTo(map);
+        branchLabelRefs.current.set(id, lab);
+      }
+
+      // Keep the compass on the edge of the map, on the line towards Makkah.
+      const placeCompass = () => {
+        const c = compassRef.current;
+        if (!c) return;
+        const { clientWidth: w, clientHeight: h } = box;
+        const p = map.project(MAKKAH);
+        // getBounds() runs far past the horizon on a tilted map, so test the screen point.
+        const onScreen = p.x >= 0 && p.y >= 0 && p.x <= w && p.y <= h;
+        c.hidden = onScreen;
+        if (onScreen) return;
+        const a = rad(distBearing(map.getCenter().toArray() as [number, number], MAKKAH).bearing - map.getBearing());
+        const dx = Math.sin(a);
+        const dy = -Math.cos(a);
+        const mx = Math.min(110, w / 2 - 8);
+        const my = Math.min(56, h / 2 - 8);
+        const k = Math.min((w / 2 - mx) / Math.max(Math.abs(dx), 1e-6), (h / 2 - my) / Math.max(Math.abs(dy), 1e-6));
+        c.style.left = `${w / 2 + dx * k}px`;
+        c.style.top = `${h / 2 + dy * k}px`;
+        c.style.setProperty("--makkah-dir", `${a}rad`);
+      };
+      map.on("move", placeCompass);
+      map.on("resize", placeCompass);
+      map.once("load", placeCompass);
+    }
+
     mapRef.current = map;
     return () => {
       window.clearTimeout(watchdog);
@@ -249,7 +386,14 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
       const label = el.querySelector(".site-pin__label");
       if (label) label.textContent = s.name;
     });
-  }, [sites]);
+    const m = makkahPinRef.current;
+    if (m) {
+      m.setAttribute("aria-label", `${t.map.makkah}, ${t.map.haram}, ${MAKKAH_KM} km. ${t.map.showMakkah}`);
+      m.querySelector("b")!.textContent = t.map.makkah;
+      m.querySelector("small")!.textContent = `${t.map.haram} · ${MAKKAH_KM} km`;
+    }
+    for (const [id, lab] of branchLabelRefs.current) lab.textContent = t.map[id];
+  }, [sites, t]);
 
   /* ── active / hover state on the pins ── */
   useEffect(() => {
@@ -348,6 +492,24 @@ export const SiteMap = memo(function SiteMap({ sites, activeId, hoverId, onSelec
         >
           <span aria-hidden className={`inline-block h-2 w-2 rounded-full ${spinning && !reducedMotion ? "bg-terracotta" : "bg-[#c9b89c]"}`} />
           {spinning && !reducedMotion ? t.map.pause : t.map.rotate}
+        </button>
+      )}
+      {variant === "full" && (
+        <button
+          ref={compassRef}
+          type="button"
+          hidden
+          onClick={() => {
+            setSpinning(false);
+            mapRef.current?.fitBounds(REGION_BOUNDS, { padding: REGION_PADDING, pitch: 30, bearing: 0, duration: reducedMotion ? 0 : 1600 });
+          }}
+          aria-label={t.map.showMakkah}
+          className="makkah-compass"
+        >
+          <span className="makkah-compass__arrow" aria-hidden>
+            ➤
+          </span>
+          {t.map.makkah} · {MAKKAH_KM} km
         </button>
       )}
       {variant === "mini" && (

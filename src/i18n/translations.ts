@@ -69,6 +69,11 @@ const en = {
     miniTitle: "Valley map",
     fullMap: "Full map",
     list: "Sites",
+    makkah: "Makkah",
+    haram: "Masjid al-Haram",
+    showMakkah: "Show the valley and Makkah together",
+    yamaniyyah: "Nakhla al-Yamaniyyah",
+    shamiyyah: "Nakhla al-Shamiyyah",
   },
   tabs: { model: "3D model", photos: "Photos" },
   gallery: {
@@ -206,6 +211,11 @@ const ar: Dict = {
     miniTitle: "خريطة الوادي",
     fullMap: "الخريطة كاملة",
     list: "المواقع",
+    makkah: "مكة المكرمة",
+    haram: "المسجد الحرام",
+    showMakkah: "اعرض الوادي ومكة معاً",
+    yamaniyyah: "نخلة اليمانية",
+    shamiyyah: "نخلة الشامية",
   },
   tabs: { model: "النموذج", photos: "الصور" },
   gallery: {
